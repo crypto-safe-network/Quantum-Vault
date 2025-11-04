@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quantum Vault - Comprar Bitcoin</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+    }
+    
+    .input-focus {
+      @apply focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition;
+    }
+
+    .btc-price {
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .calculator-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Header -->
+  <header class="glass border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-11 h-11 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center">
+            <i class="fas fa-shield-alt text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Quantum Vault</h1>
+            <p class="text-xs text-gray-400">Compra Segura de Bitcoin</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-xs text-gray-400">Mercado Ativo</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Hero Section -->
+    <div class="text-center mb-10">
+      <h2 class="text-4xl font-bold text-white mb-3">Compre Bitcoin com Segurança</h2>
+      <p class="text-lg text-gray-300">Taxa zero. Receba em minutos.</p>
+    </div>
+
+    <!-- Calculator Card -->
+    <div class="glass p-8 mb-8 calculator-card max-w-2xl mx-auto">
+      <h3 class="text-xl font-semibold text-white mb-6 text-center flex items-center justify-center">
+        <i class="fas fa-calculator mr-2 text-purple-400"></i>
+        Calculadora de Compra
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- BRL Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Você paga (R$)</label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">R$</span>
+            <input 
+              type="number" 
+              id="brl-input" 
+              value="300" 
+              min="300"
+              class="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white text-xl font-medium input-focus"
+              placeholder="300,00"
+            />
+          </div>
+          <p class="text-xs text-amber-400 mt-2"></p>
+        </div>
+
+        <!-- BTC Output -->
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Você recebe (BTC)</label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
+              <i class="fab fa-bitcoin"></i>
+            </span>
+            <input 
+              type="text" 
+              id="btc-output" 
+              class="w-full pl-12 pr-4 py-4 bg-gray-800/50 border border-gray-700 rounded-xl text-white text-xl font-medium" 
+              readonly
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Info -->
+      <div class="text-center mb-6">
+        <p class="text-xs text-gray-400">Preço atual do Bitcoin</p>
+        <p class="text-3xl font-bold text-purple-300" id="btc-price">R$432.187,42</p>
+        <p class="text-xs text-green-400 mt-1">+2.34% (24h)</p>
+      </div>
+
+      <!-- Buy Button -->
+      <button 
+        onclick="goToCheckout()" 
+        class="w-full py-5 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-bold text-lg rounded-xl btn-primary flex items-center justify-center space-x-2"
+      >
+        <i class="fas fa-shopping-cart"></i>
+        <span>Comprar Bitcoin Agora</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Checkout Modal -->
+  <div id="checkout-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden flex items-center justify-center z-50">
+    <div class="glass p-8 max-w-lg w-full mx-4 rounded-2xl border border-white/10">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-bold text-white">Finalizar Compra</h3>
+        <button onclick="closeCheckout()" class="text-gray-400 hover:text-white">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Endereço de Recebimento (BTC)</label>
+          <input 
+            type="text" 
+            id="btc-address" 
+            class="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white input-focus" 
+            placeholder="bc1q..."
+          />
+          <p class="text-xs text-gray-400 mt-2">
+            Enviaremos exatamente <span id="final-btc"></span> BTC para este endereço.
+          </p>
+        </div>
+
+        <div class="bg-gray-800/50 p-4 rounded-xl">
+          <div class="flex justify-between text-sm mb-2">
+            <span class="text-gray-400">Você paga:</span>
+            <span class="text-white font-medium" id="final-brl">R$300,00</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-400">Você recebe:</span>
+            <span class="text-purple-300 font-medium" id="final-btc-value">0.000694 BTC</span>
+          </div>
+          <div class="flex justify-between text-sm mt-3 pt-3 border-t border-gray-700">
+            <span class="text-gray-400">Taxa de rede:</span>
+            <span class="text-green-400">Grátis</span>
+          </div>
+        </div>
+
+        <button 
+          onclick="proceedToPayment()" 
+          class="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl btn-primary flex items-center justify-center space-x-2"
+        >
+          <i class="fas fa-credit-card"></i>
+          <span>Ir para Pagamento Seguro</span>
+        </button>
+
+        <p class="text-xs text-center text-gray-400">
+          Redirecionando para checkout criptografado (SSL 256-bit)
+        </p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let BTC_PRICE = 432187.42;
+  const MIN_BRL = 300;
+
+  const brlInput = document.getElementById('brl-input');
+  const btcOutput = document.getElementById('btc-output');
+  const btcPriceEl = document.getElementById('btc-price');
+  const buyButton = document.querySelector('.btn-primary');
+  const minWarning = document.createElement('p');
+  minWarning.id = 'min-warning';
+  minWarning.className = 'text-xs text-red-400 mt-2 hidden';
+  minWarning.textContent = 'Valor mínimo: R$300,00';
+  brlInput.parentElement.appendChild(minWarning);
+
+  // Atualiza BTC e valida em tempo real
+  function updateCalculator() {
+    let brl = parseFloat(brlInput.value) || 0;
+    const btc = brl / BTC_PRICE;
+
+    // Sempre mostra BTC (mesmo abaixo do mínimo)
+    btcOutput.value = btc.toFixed(8);
+
+    // Validação visual e do botão
+    if (brl < MIN_BRL) {
+      brlInput.classList.add('border-red-500');
+      minWarning.classList.remove('hidden');
+      buyButton.disabled = true;
+      buyButton.classList.add('opacity-60', 'cursor-not-allowed');
+      buyButton.classList.remove('hover:transform', 'hover:shadow-lg');
+    } else {
+      brlInput.classList.remove('border-red-500');
+      minWarning.classList.add('hidden');
+      buyButton.disabled = false;
+      buyButton.classList.remove('opacity-60', 'cursor-not-allowed');
+      buyButton.classList.add('hover:transform', 'hover:shadow-lg');
+    }
+  }
+
+  // Input em tempo real
+  brlInput.addEventListener('input', () => {
+    let value = brlInput.value.replace(/[^0-9.,]/g, '').replace(',', '.');
+    brlInput.value = value;
+    updateCalculator();
+  });
+
+  // Inicializa
+  function initCalculator() {
+    brlInput.value = MIN_BRL;
+    updateCalculator();
+  }
+
+  // Vai pro checkout (só se válido)
+  function goToCheckout() {
+    const brl = parseFloat(brlInput.value);
+    if (brl < MIN_BRL) {
+      showToast('Valor mínimo de compra: R$300,00', 'error');
+      return;
+    }
+    const btc = brl / BTC_PRICE;
+    document.getElementById('final-brl').textContent = `R$${brl.toFixed(2).replace('.', ',')}`;
+    document.getElementById('final-btc-value').textContent = `${btc.toFixed(8)} BTC`;
+    document.getElementById('final-btc').textContent = `${btc.toFixed(8)}`;
+    document.getElementById('checkout-modal').classList.remove('hidden');
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkout-modal').classList.add('hidden');
+  }
+
+  function proceedToPayment() {
+    const address = document.getElementById('btc-address').value.trim();
+    if (!address || !/^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/.test(address)) {
+      showToast('Endereço BTC inválido.', 'error');
+      return;
+    }
+
+    const brl = parseFloat(brlInput.value);
+    const btc = (brl / BTC_PRICE).toFixed(8);
+    const checkoutUrl = `https://seucheckout.com/pay?amount=${brl}&btc=${btc}&address=${encodeURIComponent(address)}&ref=quantumvault`;
+    window.location.href = checkoutUrl;
+  }
+
+  // Atualiza preço do BTC a cada 30s
+  setInterval(() => {
+    const variation = (Math.random() - 0.5) * 2000;
+    BTC_PRICE = 432187.42 + variation;
+    btcPriceEl.textContent = `R$${BTC_PRICE.toFixed(2).replace('.', ',')}`;
+    updateCalculator();
+  }, 30000);
+
+  // Toast personalizado
+  function showToast(message, type = 'error') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-6 right-6 px-6 py-3 rounded-xl text-white font-medium shadow-xl z-50 transition-all duration-300 ${
+      type === 'error' ? 'bg-red-600' : 'bg-green-600'
+    }`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 4000);
+  }
+
+  // Init
+  initCalculator();
+</script>
+</body>
+</html>
